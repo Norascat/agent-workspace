@@ -1,0 +1,9 @@
+{
+  "workspace": {
+    "root": ".",
+    "skills_dir": ".codex/skills",
+    "tasks_dir": ".codex/tasks",
+    "projects_dir": "04_project",
+    "reviews_dir": "03_conversation"
+  }
+}

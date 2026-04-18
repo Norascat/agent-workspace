@@ -1,0 +1,14 @@
+#!/bin/bash
+
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+cd "$ROOT"
+
+if ! command -v codex >/dev/null 2>&1; then
+    echo "Codex CLI not found in PATH. Install or activate it first."
+    exit 1
+fi
+
+exec codex

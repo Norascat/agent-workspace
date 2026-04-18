@@ -1,0 +1,46 @@
+#!/bin/bash
+
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+REGISTRY="$ROOT/.codex/tasks/01_tasks.json"
+
+if [ ! -f "$REGISTRY" ]; then
+    echo "No task registry found at .codex/tasks/01_tasks.json"
+    exit 0
+fi
+
+python3 - "$REGISTRY" "${1:-}" <<'PY'
+import json
+import sys
+
+registry_path = sys.argv[1]
+target_id = sys.argv[2].strip()
+
+with open(registry_path, "r", encoding="utf-8") as f:
+    data = json.load(f)
+
+tasks = data.get("tasks", [])
+
+if not tasks:
+    print("No tasks recorded.")
+    raise SystemExit(0)
+
+if target_id:
+    for task in tasks:
+        if task.get("id") == target_id:
+            for key in ["id", "slug", "status", "file", "created_at", "updated_at", "summary"]:
+                print(f"{key}: {task.get(key, '')}")
+            raise SystemExit(0)
+    print(f"Task {target_id} not found.")
+    raise SystemExit(1)
+
+print("ID  STATUS   UPDATED_AT            SUMMARY")
+for task in tasks:
+    print(
+        f"{task.get('id',''):2}  "
+        f"{task.get('status','')[:8]:8}  "
+        f"{task.get('updated_at','')[:19]:19}  "
+        f"{task.get('summary','')}"
+    )
+PY

@@ -1,0 +1,37 @@
+#!/bin/bash
+
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+REVIEW_DIR="$ROOT/03_conversation"
+
+mkdir -p "$REVIEW_DIR"
+
+DATE_STAMP=$(date +"%Y%m%d")
+HUMAN_DATE=$(date +"%Y-%m-%d")
+SLUG="${1:-session}"
+SLUG=$(printf "%s" "$SLUG" | tr '[:upper:]' '[:lower:]' | tr -cs '[:alnum:]' '-' | sed 's/^-//; s/-$//')
+
+if [ -z "$SLUG" ]; then
+    SLUG="session"
+fi
+
+FILE="$REVIEW_DIR/review_${DATE_STAMP}_${SLUG}.md"
+
+cat > "$FILE" <<EOF
+# Session Review — $HUMAN_DATE
+
+## Completed
+- 
+
+## Key Decisions
+- 
+
+## Problems & Solutions
+- 
+
+## Open Items
+- 
+EOF
+
+echo "Created review: $FILE"

@@ -1,0 +1,81 @@
+#!/bin/bash
+
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+REGISTRY="$ROOT/.codex/tasks/01_tasks.json"
+TASK_DIR="$ROOT/.codex/tasks/01_tasks"
+
+if [ $# -lt 1 ]; then
+    echo "Usage: bin/dispatch-task \"task description\""
+    exit 1
+fi
+
+mkdir -p "$TASK_DIR"
+
+if [ ! -f "$REGISTRY" ]; then
+    printf '{\n  "tasks": []\n}\n' > "$REGISTRY"
+fi
+
+DESCRIPTION="$*"
+COUNT=$(grep -c '"id"' "$REGISTRY" || true)
+ID=$(printf "%02d" $((COUNT + 1)))
+TIMESTAMP=$(date +"%Y%m%d%H%M%S")
+ISO_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+HUMAN_TIME=$(date +"%Y-%m-%d %H:%M")
+SLUG=$(printf "%s" "$DESCRIPTION" | tr '[:upper:]' '[:lower:]' | tr -cs '[:alnum:]' '-' | sed 's/^-//; s/-$//' | cut -c1-40)
+
+if [ -z "$SLUG" ]; then
+    SLUG="task"
+fi
+
+FILE_NAME="${ID}_${TIMESTAMP}_${SLUG}.md"
+TASK_FILE="$TASK_DIR/$FILE_NAME"
+
+cat > "$TASK_FILE" <<EOF
+# 任务：$SLUG
+状态：pending | 开始：$HUMAN_TIME
+
+## 目标
+$DESCRIPTION
+
+## 进度日志
+
+## 结果
+EOF
+
+SUMMARY=$(printf "%s" "$DESCRIPTION" | cut -c1-50)
+
+TMP_FILE="${REGISTRY}.tmp"
+python3 - "$REGISTRY" "$TMP_FILE" "$ID" "$SLUG" "$FILE_NAME" "$ISO_TIME" "$SUMMARY" <<'PY'
+import json
+import sys
+
+registry_path, output_path, task_id, slug, file_name, iso_time, summary = sys.argv[1:]
+
+with open(registry_path, "r", encoding="utf-8") as f:
+    data = json.load(f)
+
+tasks = data.setdefault("tasks", [])
+tasks.append(
+    {
+        "id": task_id,
+        "slug": slug,
+        "file": f"01_tasks/{file_name}",
+        "status": "pending",
+        "created_at": iso_time,
+        "updated_at": iso_time,
+        "summary": summary,
+    }
+)
+
+with open(output_path, "w", encoding="utf-8") as f:
+    json.dump(data, f, ensure_ascii=False, indent=2)
+    f.write("\n")
+PY
+
+mv "$TMP_FILE" "$REGISTRY"
+
+echo "任务 #$ID 已登记"
+echo "描述：$DESCRIPTION"
+echo "文件：.codex/tasks/01_tasks/$FILE_NAME"
