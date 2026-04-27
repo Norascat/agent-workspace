@@ -6,7 +6,7 @@
 
 ### 启动
 
-点击此文件夹右键 → 在终端中打开，输入 `claude` 回车。
+打开 Finder，右键此文件夹 → 「新建位于文件夹位置的终端窗口」，输入 `claude` 回车。
 
 ### 开新项目
 
@@ -43,18 +43,27 @@
 
 ### 运行配置脚本
 
-1. 打开这个文件夹
-2. 双击 `setup.bat`（弹安全提示选「仍要运行」）
+1. 打开此文件夹
+2. **双击 `setup.command`**（首次弹安全提示 → 右键 → 打开）
 
 脚本自动检测环境并配置。缺少软件按下面安装：
 
 ### Node.js（必须）
 
-打开 https://nodejs.org，点绿色按钮下载，一路「下一步」装完。
+**方式 A — Homebrew（推荐）：**
+
+```bash
+# 先安装 Homebrew（如未安装）
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+brew install node
+```
+
+**方式 B — 官网安装包：** 访问 https://nodejs.org，下载 macOS .pkg，双击安装。
 
 ### Claude Code（必须）
 
-装完 Node.js 后，`Win + R` 输入 `cmd` 回车：
+装完 Node.js 后，打开终端：
 
 ```bash
 npm install -g @anthropic-ai/claude-code
@@ -65,20 +74,22 @@ claude login
 
 ### Git（可选）
 
-https://git-scm.com，一路默认安装。
+macOS 通常已预装。终端输入 `git --version` 确认；若弹提示点「安装」即可（Xcode Command Line Tools）。
 
-装完后重新运行 `setup.ps1`，全部绿色 ✓ 即可。
+装完后重新运行 `setup.command`，全部绿色 ✓ 即可。
 
 ---
 
 ## 第二步：启动
 
-打开命令行（cmd 或 PowerShell）：
+打开终端，cd 到此文件夹：
 
 ```bash
-cd "这个文件夹的完整路径"
+cd "/path/to/this/folder"
 claude
 ```
+
+**快捷方式：** 打开 Finder，把文件夹拖到终端图标 → 自动 cd 进去。
 
 ---
 
@@ -87,10 +98,10 @@ claude
 | 快捷键 | 作用 |
 |--------|------|
 | `Shift + Tab` | 切换模式（Plan 规划 / Code 执行） |
-| `Alt + V` | 粘贴截图给 Claude |
-| `Ctrl + C` 两次 | 撤销当前输入 |
+| `Ctrl + V` | 粘贴截图给 Claude（截图后直接粘贴） |
+| `Ctrl + C`  | 撤销当前输入 |
 
-**.md 文档用 VSCode 打开**，按 `Ctrl + Shift + V` 实时预览。
+**.md 文档用 VSCode 打开**，按 `Cmd + Shift + V` 实时预览。
 
 ---
 
@@ -148,12 +159,18 @@ claude
 
 ## 常见问题
 
-**输入 claude 提示「不是内部命令」**：Node.js 没装好，或装完没重启命令行。
+**双击 setup.command 没反应或「无法打开」**：
+右键 → 打开 → 点「打开」（绕过 Gatekeeper 首次验证）。
+或终端执行：`chmod +x setup.command && bash install.sh`
 
-**claude login 失败**：检查网络，确认账号已在 https://console.anthropic.com 注册。
+**输入 `claude` 提示「command not found」**：
+Node.js 未正确安装，或安装后未重启终端。
+执行 `source ~/.zshrc`（或 `source ~/.bash_profile`）刷新环境变量。
+
+**`claude login` 失败**：检查网络，确认账号已在 https://console.anthropic.com 注册。
 
 **对话太长**：`/clear` 新建，`/resume` 可以恢复。
 
-**怎么预览 .md 文件**：VSCode 打开，`Ctrl + Shift + V`。
+**怎么预览 .md 文件**：VSCode 打开，`Cmd + Shift + V`。
 
-**手机操控**：用 ToDesk 远程桌面。
+**手机操控 Mac**：用 ToDesk 或 Screen Sharing 远程桌面。
